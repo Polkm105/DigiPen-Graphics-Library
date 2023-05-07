@@ -31,11 +31,11 @@ vs_out main(vs_in input) {
     output.color.x = (input.color.x * input.color.w) + (tintColor.x * tintColor.w);
     output.color.y = (input.color.y * input.color.w) + (tintColor.y * tintColor.w);
     output.color.z = (input.color.z * input.color.w) + (tintColor.z * tintColor.w);
-    output.color.w = (input.color.w * input.color.w) + (tintColor.w * tintColor.w);
+    output.color.w = 1 + (tintColor.w * tintColor.w);
 
     output.tex_coord = input.tex_coord + texOffset;
 
-    output.alpha = alpha;
+    output.alpha = 1;
 
     return output;
 }
