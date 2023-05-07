@@ -23,6 +23,56 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, 
     }
 }
 
+static DGL_Mesh* mesh;
+
+static void TestingInit()
+{
+    typedef struct Vertex {
+        DGL_Vec2 position;
+        DGL_Color color;
+        DGL_Vec2 texture_coordinates;
+    } Vertex;
+
+    Vertex vertices[] = {
+        {{-0.5f,  0.5f}, {1, 0, 0, 1}, {0, 0}},
+        {{-0.5,  -0.5f}, {0, 1, 0, 1}, {0, 1}},
+        {{ 0.5f, -0.5f}, {0, 0, 1, 1}, {1, 1}},
+        {{ 0.5f,  0.5f}, {0, 1, 1, 1}, {1, 0}}
+    };
+
+    unsigned indices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
+    DGL_Graphics_StartMesh();
+
+    for (int i = 0; i < 4; ++i)
+    {
+        DGL_Graphics_AddVertex(
+            &vertices[i].position,
+            &vertices[i].color,
+            &vertices[i].texture_coordinates);
+    }
+
+    mesh = DGL_Graphics_EndMeshIndexed(indices, 6);
+    DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
+}
+
+static void TestingUpdate()
+{
+    DGL_Vec2 position = { 0, 0 };
+    DGL_Vec2 scale = { 100, 100 };
+    float rotation = 0;
+
+    DGL_Graphics_SetCB_TransformData(&position, &scale, rotation);
+    DGL_Graphics_DrawMesh(mesh, DGL_DM_TRIANGLELIST);
+}
+
+static void TestingShutdown()
+{
+    DGL_Graphics_FreeMesh(&mesh);
+}
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -48,6 +98,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     DGL_Color color = { 0.1f, 0.1f, 0.1f, 1.0f };
     DGL_Graphics_SetBackgroundColor(&color);
 
+    TestingInit();
+
     int running = TRUE;
     while (running)
     {
@@ -56,12 +108,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
         DGL_Graphics_StartDrawing();
 
+        TestingUpdate();
+
         DGL_Graphics_FinishDrawing();
 
         if (!DGL_System_DoesWindowExist())
             running = FALSE;
     }
 
+    TestingShutdown();
     DGL_System_Exit();
 
     return 0;
