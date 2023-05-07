@@ -24,6 +24,7 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, 
 }
 
 static DGL_Mesh* mesh;
+static const DGL_VertexShader* vertex_shader;
 
 static void TestingInit()
 {
@@ -56,6 +57,7 @@ static void TestingInit()
     }
 
     mesh = DGL_Graphics_EndMeshIndexed(indices, 6);
+    vertex_shader = DGL_Graphics_LoadVertexShader("CustomVertexShader.hlsl");
     DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
 }
 
@@ -67,11 +69,14 @@ static void TestingUpdate()
 
     DGL_Graphics_SetCB_TransformData(&position, &scale, rotation);
     DGL_Graphics_DrawMesh(mesh, DGL_DM_TRIANGLELIST);
+
+
 }
 
 static void TestingShutdown()
 {
     DGL_Graphics_FreeMesh(&mesh);
+    DGL_Graphics_FreeVertexShader(&vertex_shader);
 }
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
